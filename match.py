@@ -215,11 +215,41 @@ def to_excel(df, sheet_name='Sheet1'):
     output.seek(0)  # Go to the start of the stream
     return output.getvalue()
 
+
+def show_readme():
+    # Function to display README contents
+    with open("README.md", "r", encoding="utf-8") as file:
+        readme_contents = file.read()
+    st.markdown(readme_contents)
+
 def main():
     # Sidebar for navigation
     st.sidebar.title("Navigation")
-    section = st.sidebar.radio("Select a Section", ['Section 1 - TDS GL and Revenue Register Merger', 'Section 2 - 26AS to Excel Conversion', 'Section 3 - Reconciliation'])
+    st.sidebar.header("Instructions")
+    st.sidebar.write("This app provides utilities for TDS GL and Revenue Register Merger, "
+                     "26AS to Excel Conversion, and Reconciliation. Select a section from "
+                     "the radio buttons below to proceed with the specific utility. "
+                     "Ensure to have all necessary files prepared and formatted according "
+                     "to the requirements mentioned in each section.")
+    
+    if 'show_readme' not in st.session_state:
+        st.session_state.show_readme = False
+    
+    if st.sidebar.button("Show README") and not st.session_state.show_readme:
+        st.session_state.show_readme = True
+    if st.session_state.show_readme:
+        show_readme()
+        if st.button("Back to App"):
+            st.session_state.show_readme = False
+        return  # Early return to avoid displaying the rest of the app
+    
+    section = st.sidebar.radio("Select a Section", ['Section 1 - TDS GL and Revenue Register Merger', 
+                                                    'Section 2 - 26AS to Excel Conversion', 
+                                                    'Section 3 - Reconciliation'])
+    
 
+    
+    
     if section == 'Section 1 - TDS GL and Revenue Register Merger':
         st.title('TDS GL and Revenue Register Merger Utility')
         st.write("Download the Blank template and fill in the Revenue Register")
@@ -274,6 +304,7 @@ def main():
 
     elif section == 'Section 2 - 26AS to Excel Conversion':
         st.title("26AS Text File Processor")
+        st.write("## Upload 26AS text file from government portal")
         text_file_26as = st.file_uploader("Upload 26AS File (Text)", type=['txt'])
         if text_file_26as:
             file_content = text_file_26as.getvalue().decode("utf-8")
@@ -288,8 +319,8 @@ def main():
             )
         
     elif section == 'Section 3 - Reconciliation':
-        st.title("TDS Matching Tool")
-        st.write("## Upload 26AS and TDS GL Files")
+        st.title("26AS Reconciliation Tool")
+        st.write("## Upload Previously exported 26AS and TDS GL Excel Files")
         file_26AS = st.file_uploader("Upload 26AS file", type=['xlsx'])
         file_tds_gl = st.file_uploader("Upload TDS GL file", type=['xlsx'])
         if file_26AS and file_tds_gl:
